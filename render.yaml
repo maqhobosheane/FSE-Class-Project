@@ -14,7 +14,6 @@ services:
         generateValue: true
       - key: DATABASE_URL
         fromService: { 
-          type: postgres, 
           name: fse-bot-db, 
           property: connectionString }
       - key: TELEGRAM_BOT_TOKEN
