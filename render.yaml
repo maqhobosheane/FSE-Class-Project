@@ -3,8 +3,8 @@ services:
     name: fse-bot
     runtime: python
     plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn run:flask_app --bind 0.0.0.0:$PORT
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn run:flask_app --bind 0.0.0.0:$PORT"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
@@ -13,9 +13,9 @@ services:
       - key: ENCRYPTION_KEY
         generateValue: true
       - key: DATABASE_URL
-        fromService: { 
-          name: fse-bot-db, 
-          property: connectionString }
+        fromDatabase:
+          name: fse-bot-db
+          property: connectionString
       - key: TELEGRAM_BOT_TOKEN
         sync: false
       - key: WEBHOOK_URL
