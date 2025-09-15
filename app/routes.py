@@ -1,12 +1,9 @@
 import telebot
 from flask import request
-from app import flask_app
 from app.database.session import get_db
 from app.telegram_bot import handlers
-from config import config
-
-# Initialize Telegram bot
-bot = telebot.TeleBot(config.TELEGRAM_BOT_TOKEN)
+from app import flask_app
+from app.bot import bot
 
 @flask_app.route('/')
 def index():

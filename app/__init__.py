@@ -5,5 +5,8 @@ from config import config
 flask_app = Flask(__name__)
 flask_app.config.from_object(config)
 
-# Import routes first (this will create the bot and register handlers)
+# Import bot first
+from app.bot import bot
+
+# Import routes to register them with the app
 from app import routes
