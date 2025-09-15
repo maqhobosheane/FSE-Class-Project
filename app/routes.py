@@ -50,17 +50,22 @@ def webhook():
 
 print(f"DEBUG: Registering handlers with bot: {bot}")
 
-@bot.message_handler(func=lambda message: message.text == '/start')
-def start_command_handler(message: telebot.types.Message):
-    try:
-        print(f"DEBUG: Start command received from user {message.from_user.id}")
-        db = next(get_db())
-        handlers.handle_start_command(bot, message, db)
-        print("DEBUG: Start command processed successfully")
-    except Exception as e:
-        print(f"DEBUG: Error in start command handler: {str(e)}")
-        import traceback
-        traceback.print_exc()
+# Test with a simple handler first
+@bot.message_handler(func=lambda message: True)
+def test_handler(message: telebot.types.Message):
+    print(f"DEBUG: ANY MESSAGE received: {message.text} from user {message.from_user.id}")
+    if message.text == '/start':
+        print("DEBUG: This is a /start command!")
+        try:
+            db = next(get_db())
+            handlers.handle_start_command(bot, message, db)
+            print("DEBUG: Start command processed successfully")
+        except Exception as e:
+            print(f"DEBUG: Error in start command handler: {str(e)}")
+            import traceback
+            traceback.print_exc()
+    else:
+        print(f"DEBUG: Not a /start command, ignoring: {message.text}")
 
 @bot.message_handler(commands=['create'])
 def create_command_handler(message: telebot.types.Message):
