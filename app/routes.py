@@ -29,11 +29,27 @@ def webhook():
             print(f"DEBUG: Parsed update: {update}")
             print(f"DEBUG: About to process update with bot: {bot}")
             print(f"DEBUG: Bot handlers before processing: {len(bot.message_handlers)} message handlers, {len(bot.callback_query_handlers)} callback handlers")
+            
+            # Try manual handler execution
+            print(f"DEBUG: Message text: '{update.message.text}'")
+            print(f"DEBUG: Message from user: {update.message.from_user.id}")
+            
             try:
                 bot.process_new_updates([update])
                 print("DEBUG: Successfully processed update")
             except Exception as e:
                 print(f"DEBUG: Exception in bot.process_new_updates: {str(e)}")
+                import traceback
+                traceback.print_exc()
+            
+            # Try calling handler directly
+            try:
+                print("DEBUG: Trying to call handler directly...")
+                from app.routes import test_handler
+                test_handler(update.message)
+                print("DEBUG: Direct handler call completed")
+            except Exception as e:
+                print(f"DEBUG: Exception in direct handler call: {str(e)}")
                 import traceback
                 traceback.print_exc()
             return 'OK', 200
