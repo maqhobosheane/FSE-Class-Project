@@ -1,4 +1,4 @@
-#!/home/maqhobosheane/fse/xrpl-telegram-wallet/venv/bin/python3
+#!/Users/dylantasdhary/Desktop/fse_bot_project/venv/bin/python3.12
 # -*- coding: utf-8 -*-
 import re
 import sys

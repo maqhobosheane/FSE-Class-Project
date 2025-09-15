@@ -20,32 +20,63 @@ def set_webhook():
 @flask_app.route('/telegram-webhook', methods=['POST'])
 def webhook():
     """Handles incoming updates from Telegram."""
-    if request.headers.get('content-type') == 'application/json':
-        json_string = request.get_data().decode('utf-8')
-        update = telebot.types.Update.de_json(json_string)
-        bot.process_new_updates([update])
-        return 'OK', 200
-    else:
-        return 'Unsupported Media Type', 415
+    try:
+        if request.headers.get('content-type') == 'application/json':
+            json_string = request.get_data().decode('utf-8')
+            print(f"DEBUG: Received webhook data: {json_string}")
+            update = telebot.types.Update.de_json(json_string)
+            print(f"DEBUG: Parsed update: {update}")
+            bot.process_new_updates([update])
+            print("DEBUG: Successfully processed update")
+            return 'OK', 200
+        else:
+            print(f"DEBUG: Unsupported content type: {request.headers.get('content-type')}")
+            return 'Unsupported Media Type', 415
+    except Exception as e:
+        print(f"DEBUG: Error in webhook handler: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return 'Internal Server Error', 500
 
 # --- Message and Callback Handlers ---
 
 @bot.message_handler(commands=['start'])
 def start_command_handler(message: telebot.types.Message):
-    db = next(get_db())
-    handlers.handle_start_command(bot, message, db)
+    try:
+        print(f"DEBUG: Start command received from user {message.from_user.id}")
+        db = next(get_db())
+        handlers.handle_start_command(bot, message, db)
+        print("DEBUG: Start command processed successfully")
+    except Exception as e:
+        print(f"DEBUG: Error in start command handler: {str(e)}")
+        import traceback
+        traceback.print_exc()
 
 @bot.message_handler(commands=['create'])
 def create_command_handler(message: telebot.types.Message):
-    # This handler is for users who type /create manually
-    db = next(get_db())
-    handlers.handle_create_command(bot, message, db)
+    try:
+        print(f"DEBUG: Create command received from user {message.from_user.id}")
+        # This handler is for users who type /create manually
+        db = next(get_db())
+        handlers.handle_create_command(bot, message, db)
+        print("DEBUG: Create command processed successfully")
+    except Exception as e:
+        print(f"DEBUG: Error in create command handler: {str(e)}")
+        import traceback
+        traceback.print_exc()
 
 @bot.callback_query_handler(func=lambda call: call.data == 'create_wallet')
 def create_callback_handler(call: telebot.types.CallbackQuery):
-    # This handler is for the inline button press
-    db = next(get_db())
-    # Acknowledge the callback
-    bot.answer_callback_query(call.id)
-    # The message object within a callback is linked to the original message
-    handlers.handle_create_command(bot, call.message, db)
+    try:
+        print(f"DEBUG: Callback query received from user {call.from_user.id}, data: {call.data}")
+        # This handler is for the inline button press
+        db = next(get_db())
+        # Acknowledge the callback
+        bot.answer_callback_query(call.id)
+        # The message object within a callback is linked to the original message
+        handlers.handle_create_command(bot, call.message, db)
+        print("DEBUG: Callback query processed successfully")
+    except Exception as e:
+        print(f"DEBUG: Error in callback query handler: {str(e)}")
+        import traceback
+        traceback.print_exc()

@@ -11,8 +11,10 @@ def handle_start_command(bot: telebot.TeleBot, message: telebot.types.Message, d
     Checks if user exists and sends the appropriate welcome message.
     """
     tg_id = message.from_user.id
-    user = crud.get_user_by_telegram_id(db, tg_id=tg_id)
+    print(f"DEBUG: Received Telegram ID: {tg_id} (type: {type(tg_id)})")
 
+    user = crud.get_user_by_telegram_id(db, tg_id=tg_id)
+    print(f"DEBUG: User lookup result: {user}")
     if user:
         # User exists
         response_text = f"Welcome back! Your XRPL address is: `{user.wallet_address}`"
@@ -34,9 +36,12 @@ def handle_create_command(bot: telebot.TeleBot, message: telebot.types.Message, 
     """
     tg_id = message.from_user.id
     chat_id = message.chat.id
+    print(f"DEBUG CREATE: Received Telegram ID: {tg_id} (type: {type(tg_id)})")
     
     # Double-check if user already exists
-    if crud.get_user_by_telegram_id(db, tg_id=tg_id):
+    existing_user = crud.get_user_by_telegram_id(db, tg_id=tg_id)
+    print(f"DEBUG CREATE: Existing user check result: {existing_user}")
+    if existing_user:
         bot.send_message(chat_id, "You already have a wallet!")
         return
 
