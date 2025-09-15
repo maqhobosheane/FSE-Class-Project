@@ -21,11 +21,38 @@ def set_webhook():
 @flask_app.route('/telegram-webhook', methods=['POST'])
 def webhook():
     """Handles incoming updates from Telegram."""
+    if request.headers.get('content-type') == 'application/json':
+        try:
+            json_string = request.get_data().decode('utf-8')
+            update = telebot.types.Update.de_json(json_string)
+
+            # Let the library do its job. This is the most important line.
+            bot.process_new_updates([update])
+
+            # This is how you add SAFE logging
+            if update.message and update.message.text:
+                logging.info(f"Received message: {update.message.text}")
+            elif update.callback_query and update.callback_query.data:
+                logging.info(f"Received callback: {update.callback_query.data}")
+
+            return 'OK', 200
+        except Exception as e:
+            logging.error("An error occurred in webhook processing", exc_info=True)
+            return 'Internal Server Error', 500
+    else:
+        return 'Unsupported Media Type', 415
+
+
+
+    """
     try:
         if request.headers.get('content-type') == 'application/json':
             json_string = request.get_data().decode('utf-8')
+
             print(f"DEBUG: Received webhook data: {json_string}")
+            
             update = telebot.types.Update.de_json(json_string)
+
             print(f"DEBUG: Parsed update: {update}")
             print(f"DEBUG: About to process update with bot: {bot}")
             print(f"DEBUG: Bot handlers before processing: {len(bot.message_handlers)} message handlers, {len(bot.callback_query_handlers)} callback handlers")
@@ -34,17 +61,6 @@ def webhook():
             print(f"DEBUG: Message text: '{update.message.text}'")
             print(f"DEBUG: Message from user: {update.message.from_user.id}")
             
-            # Use direct handler calls since bot.process_new_updates() doesn't work
-            try:
-                print("DEBUG: Calling handler directly...")
-                from app.routes import test_handler
-                test_handler(update.message)
-                print("DEBUG: Handler call completed")
-            except Exception as e:
-                print(f"DEBUG: Exception in handler call: {str(e)}")
-                import traceback
-                traceback.print_exc()
-            return 'OK', 200
         else:
             print(f"DEBUG: Unsupported content type: {request.headers.get('content-type')}")
             return 'Unsupported Media Type', 415
@@ -53,7 +69,7 @@ def webhook():
         import traceback
         traceback.print_exc()
         return 'Internal Server Error', 500
-
+"""
 # --- Message and Callback Handlers ---
 
 print(f"DEBUG: Registering handlers with bot: {bot}")
