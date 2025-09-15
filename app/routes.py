@@ -7,7 +7,7 @@ from app.bot import bot
 
 @flask_app.route('/')
 def index():
-    return "Bot is running!", 200
+    return "Bot is running! Version 2.0", 200
 
 @flask_app.route('/set_webhook')
 def set_webhook():
@@ -50,7 +50,7 @@ def webhook():
 
 print(f"DEBUG: Registering handlers with bot: {bot}")
 
-@bot.message_handler(commands=['start'])
+@bot.message_handler(func=lambda message: message.text == '/start')
 def start_command_handler(message: telebot.types.Message):
     try:
         print(f"DEBUG: Start command received from user {message.from_user.id}")
