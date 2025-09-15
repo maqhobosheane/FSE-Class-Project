@@ -27,6 +27,8 @@ def webhook():
             print(f"DEBUG: Received webhook data: {json_string}")
             update = telebot.types.Update.de_json(json_string)
             print(f"DEBUG: Parsed update: {update}")
+            print(f"DEBUG: About to process update with bot: {bot}")
+            print(f"DEBUG: Bot handlers before processing: {len(bot.message_handlers)} message handlers, {len(bot.callback_query_handlers)} callback handlers")
             bot.process_new_updates([update])
             print("DEBUG: Successfully processed update")
             return 'OK', 200
