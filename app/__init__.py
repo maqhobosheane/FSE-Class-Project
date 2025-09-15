@@ -1,4 +1,3 @@
-import telebot
 from flask import Flask
 from config import config
 
@@ -6,8 +5,5 @@ from config import config
 flask_app = Flask(__name__)
 flask_app.config.from_object(config)
 
-# Initialize Telegram bot
-bot = telebot.TeleBot(config.TELEGRAM_BOT_TOKEN)
-
-# Import routes to register them with the app
+# Import routes first (this will create the bot and register handlers)
 from app import routes
