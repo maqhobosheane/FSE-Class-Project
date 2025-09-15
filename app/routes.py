@@ -1,5 +1,6 @@
 import telebot
 from flask import request
+import traceback
 from app.database.session import get_db
 from app.telegram_bot import handlers
 from app import flask_app
@@ -21,6 +22,12 @@ def set_webhook():
 @flask_app.route('/telegram-webhook', methods=['POST'])
 def webhook():
     """Handles incoming updates from Telegram."""
+   import traceback # Add this to the top of your file to print error details
+
+# ...
+
+def webhook():
+    """Handles incoming updates from Telegram."""
     if request.headers.get('content-type') == 'application/json':
         try:
             json_string = request.get_data().decode('utf-8')
@@ -29,20 +36,20 @@ def webhook():
             # Let the library do its job. This is the most important line.
             bot.process_new_updates([update])
 
-            # This is how you add SAFE logging
+            # This is how you add SAFE print statements
             if update.message and update.message.text:
-                logging.info(f"Received message: {update.message.text}")
+                print(f"INFO: Received message: {update.message.text}")
             elif update.callback_query and update.callback_query.data:
-                logging.info(f"Received callback: {update.callback_query.data}")
+                print(f"INFO: Received callback: {update.callback_query.data}")
 
             return 'OK', 200
         except Exception as e:
-            logging.error("An error occurred in webhook processing", exc_info=True)
+            # Print the exception and a detailed traceback for debugging
+            print(f"ERROR: An error occurred in webhook processing: {e}")
+            traceback.print_exc()
             return 'Internal Server Error', 500
     else:
         return 'Unsupported Media Type', 415
-
-
 
     """
     try:
