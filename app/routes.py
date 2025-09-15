@@ -41,6 +41,8 @@ def webhook():
 
 # --- Message and Callback Handlers ---
 
+print(f"DEBUG: Registering handlers with bot: {bot}")
+
 @bot.message_handler(commands=['start'])
 def start_command_handler(message: telebot.types.Message):
     try:
@@ -81,3 +83,7 @@ def create_callback_handler(call: telebot.types.CallbackQuery):
         print(f"DEBUG: Error in callback query handler: {str(e)}")
         import traceback
         traceback.print_exc()
+
+# Debug: Print all registered handlers
+print(f"DEBUG: All registered message handlers: {bot.message_handlers}")
+print(f"DEBUG: All registered callback handlers: {bot.callback_query_handlers}")
