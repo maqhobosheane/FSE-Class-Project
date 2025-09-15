@@ -29,8 +29,13 @@ def webhook():
             print(f"DEBUG: Parsed update: {update}")
             print(f"DEBUG: About to process update with bot: {bot}")
             print(f"DEBUG: Bot handlers before processing: {len(bot.message_handlers)} message handlers, {len(bot.callback_query_handlers)} callback handlers")
-            bot.process_new_updates([update])
-            print("DEBUG: Successfully processed update")
+            try:
+                bot.process_new_updates([update])
+                print("DEBUG: Successfully processed update")
+            except Exception as e:
+                print(f"DEBUG: Exception in bot.process_new_updates: {str(e)}")
+                import traceback
+                traceback.print_exc()
             return 'OK', 200
         else:
             print(f"DEBUG: Unsupported content type: {request.headers.get('content-type')}")
