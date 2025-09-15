@@ -22,12 +22,6 @@ def set_webhook():
 @flask_app.route('/telegram-webhook', methods=['POST'])
 def webhook():
     """Handles incoming updates from Telegram."""
-   import traceback # Add this to the top of your file to print error details
-
-# ...
-
-def webhook():
-    """Handles incoming updates from Telegram."""
     if request.headers.get('content-type') == 'application/json':
         try:
             json_string = request.get_data().decode('utf-8')
