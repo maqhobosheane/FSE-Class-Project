@@ -16,6 +16,9 @@ if not BOT_TOKEN:
 bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
 
+# Optional: public base URL for webhook setup
+WEBHOOK_BASE = os.getenv('WEBHOOK_URL')  # e.g., https://your-app.onrender.com
+
 # Simple handler
 @bot.message_handler(commands=['start'])
 def handle_start(message):
@@ -34,6 +37,15 @@ def webhook():
         bot.process_new_updates([update])
         return 'OK', 200
     return 'Bad Request', 400
+
+@app.route('/set_webhook')
+def set_webhook():
+    if not WEBHOOK_BASE:
+        return "WEBHOOK_URL is not set", 500
+    webhook_url = f"{WEBHOOK_BASE}/telegram-webhook"
+    bot.remove_webhook()
+    ok = bot.set_webhook(url=webhook_url)
+    return (f"Webhook set to {webhook_url}", 200) if ok else ("Failed to set webhook", 500)
 
 @app.route('/')
 def index():
