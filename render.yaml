@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: python simple_bot.py
+    startCommand: python app/database/__init__.py &&python run.py 
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
