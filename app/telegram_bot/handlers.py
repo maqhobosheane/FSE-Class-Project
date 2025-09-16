@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.database import crud
 from app.services import price_service
 from app.xrpl_client import wallet as xrpl_wallet
+from xrpl.utils import drops_to_xrp
 from app.utils.crypto import encrypt_seed
 from . import keyboards
 
@@ -92,3 +93,30 @@ def handle_view_price_history(bot: telebot.TeleBot, message: telebot.types.Messa
     
     # 3. Send the formatted message to the user
     bot.send_message(chat_id, price_message, parse_mode="Markdown")
+    
+def handle_check_balance(bot: telebot.TeleBot, message: telebot.types.Message, db: Session):
+    """
+    Handles the 'Check Balance' button click.
+    Verifies the user and sends their XRPL account balance.
+    """
+    tg_id = message.from_user.id
+    chat_id = message.chat.id
+    
+    # 1. Verify user exists
+    user = crud.get_user_by_telegram_id(db, tg_id=tg_id)
+    if not user:
+        bot.send_message(chat_id, "Please use /start and create a wallet first.")
+        return
+
+    # 2. Call the XRPL client to get the balance in drops
+    balance_in_drops = xrpl_wallet.get_account_balance(user.wallet_address)
+    
+    if balance_in_drops is not None:
+        # 3. Convert from drops to XRP and format the message
+        balance_in_xrp = drops_to_xrp(balance_in_drops)
+        response_text = f"💰 Your current balance is: *{balance_in_xrp:,.6f} XRP*"
+    else:
+        response_text = "Sorry, there was an error fetching your account balance."
+        
+    # 4. Send the message to the user
+    bot.send_message(chat_id, response_text, parse_mode="Markdown")

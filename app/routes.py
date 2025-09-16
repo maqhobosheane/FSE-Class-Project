@@ -55,8 +55,11 @@ def learn_more_handler(call: telebot.types.CallbackQuery):
 
 @bot.callback_query_handler(func=lambda call: call.data == 'check_balance')
 def check_balance_handler(call: telebot.types.CallbackQuery):
+    """Handles the 'check_balance' button, calling the new logic handler."""
+    db = next(get_db())
     bot.answer_callback_query(call.id)
-    bot.send_message(call.message.chat.id, "Checking your balance... (Functionality coming soon!)")
+    # Call the new handler function with the business logic
+    handlers.handle_check_balance(bot, call.message, db)
 
 @bot.callback_query_handler(func=lambda call: call.data == 'send_xrp')
 def send_xrp_handler(call: telebot.types.CallbackQuery):

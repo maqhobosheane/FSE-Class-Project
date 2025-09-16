@@ -7,3 +7,5 @@ pyTelegramBotAPI==4.17.0
 cryptography==42.0.7
 requests==2.32.3
 gunicorn==22.0.0
+matplotlib==3.9.0
+imgurpython==1.1.7
