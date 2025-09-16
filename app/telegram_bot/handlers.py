@@ -1,6 +1,7 @@
 import telebot
 from sqlalchemy.orm import Session
 from app.database import crud
+from app.services import price_service
 from app.xrpl_client import wallet as xrpl_wallet
 from app.utils.crypto import encrypt_seed
 from . import keyboards
@@ -35,24 +36,19 @@ def handle_create_command(bot: telebot.TeleBot, message: telebot.types.Message, 
     tg_id = message.from_user.id
     chat_id = message.chat.id
     
-    # Double-check if user already exists
     if crud.get_user_by_telegram_id(db, tg_id=tg_id):
-        bot.send_message(chat_id, "You already have a wallet!")
+        bot.send_message(chat_id, "You already have a wallet! Here are your options:", reply_markup=keyboards.create_main_menu_keyboard())
         return
 
-    # Let the user know we're working on it
     bot.send_message(chat_id, "Generating your new XRPL wallet... 🛠️")
     
-    # 1. Generate faucet wallet
     new_wallet = xrpl_wallet.create_xrpl_account()
     if not new_wallet:
         bot.send_message(chat_id, "Sorry, there was an error creating your wallet. Please try again later.")
         return
 
-    # 2. Encrypt the seed
     encrypted_seed = encrypt_seed(new_wallet.seed)
 
-    # 3. Save the new user to the database
     crud.save_new_user(
         db=db,
         tg_id=tg_id,
@@ -60,12 +56,39 @@ def handle_create_command(bot: telebot.TeleBot, message: telebot.types.Message, 
         encrypted_seed=encrypted_seed
     )
 
-    # 4. Confirm to the user
-    # Corresponds to: return success_status & xrp_add
     response_text = (
         "🎉 Welcome! Your new XRPL wallet has been created and funded with test XRP.\n\n"
         f"*Address:* `{new_wallet.classic_address}`\n\n"
         "**IMPORTANT:** We have securely stored your encrypted seed. You are responsible for your account's security."
     )
-    # Corresponds to: return update.message()
-    bot.send_message(chat_id, response_text, parse_mode="Markdown")
+    
+    # Send the success message and attach the new main menu keyboard <- MM
+    bot.send_message(
+        chat_id, 
+        response_text, 
+        parse_mode="Markdown",
+        reply_markup=keyboards.create_main_menu_keyboard() 
+    )
+    
+def handle_view_price_history(bot: telebot.TeleBot, message: telebot.types.Message, db: Session):
+    """
+    Handles the 'View Price History' button click.
+    Verifies the user and sends the price history.
+    """
+    tg_id = message.from_user.id
+    chat_id = message.chat.id
+    
+    # 1. Verify user exists in the database
+    user = crud.get_user_by_telegram_id(db, tg_id=tg_id)
+    if not user:
+        bot.send_message(chat_id, "Please use /start and create a wallet first.")
+        return
+
+    # Let the user know we're working on it
+    bot.send_message(chat_id, "Fetching price history... 📈")
+
+    # 2. Call the price service to get the data
+    price_message = price_service.get_price_history()
+    
+    # 3. Send the formatted message to the user
+    bot.send_message(chat_id, price_message, parse_mode="Markdown")

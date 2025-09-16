@@ -1,3 +1,4 @@
+# app/routes.py
 import telebot
 from flask import request
 from app import flask_app, bot
@@ -16,7 +17,6 @@ def set_webhook():
     bot.set_webhook(url=webhook_url)
     return f"Webhook set to {webhook_url}", 200
 
-# This is the main endpoint that Telegram will send updates to
 @flask_app.route('/telegram-webhook', methods=['POST'])
 def webhook():
     """Handles incoming updates from Telegram."""
@@ -37,15 +37,36 @@ def start_command_handler(message: telebot.types.Message):
 
 @bot.message_handler(commands=['create'])
 def create_command_handler(message: telebot.types.Message):
-    # This handler is for users who type /create manually
     db = next(get_db())
     handlers.handle_create_command(bot, message, db)
 
 @bot.callback_query_handler(func=lambda call: call.data == 'create_wallet')
 def create_callback_handler(call: telebot.types.CallbackQuery):
-    # This handler is for the inline button press
     db = next(get_db())
-    # Acknowledge the callback
     bot.answer_callback_query(call.id)
-    # The message object within a callback is linked to the original message
     handlers.handle_create_command(bot, call.message, db)
+
+# --- Placeholder Handlers for New Menu Buttons ---
+
+@bot.callback_query_handler(func=lambda call: call.data == 'learn_more')
+def learn_more_handler(call: telebot.types.CallbackQuery):
+    bot.answer_callback_query(call.id)
+    bot.send_message(call.message.chat.id, "This bot helps you manage an XRPL testnet wallet. (Functionality coming soon!)")
+
+@bot.callback_query_handler(func=lambda call: call.data == 'check_balance')
+def check_balance_handler(call: telebot.types.CallbackQuery):
+    bot.answer_callback_query(call.id)
+    bot.send_message(call.message.chat.id, "Checking your balance... (Functionality coming soon!)")
+
+@bot.callback_query_handler(func=lambda call: call.data == 'send_xrp')
+def send_xrp_handler(call: telebot.types.CallbackQuery):
+    bot.answer_callback_query(call.id)
+    bot.send_message(call.message.chat.id, "Let's send some XRP! (Functionality coming soon!)")
+    
+@bot.callback_query_handler(func=lambda call: call.data == 'view_price_history')
+def price_history_handler(call: telebot.types.CallbackQuery):
+    """Handles the 'view_price_history' button, calling the new logic handler."""
+    db = next(get_db())
+    bot.answer_callback_query(call.id)
+    # Call the new handler function with the business logic
+    handlers.handle_view_price_history(bot, call.message, db)
