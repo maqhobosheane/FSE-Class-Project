@@ -1,4 +1,3 @@
-# app/routes.py
 import telebot
 from flask import request
 from app import flask_app, bot
@@ -38,15 +37,13 @@ def start_command_handler(message: telebot.types.Message):
 @bot.message_handler(commands=['create'])
 def create_command_handler(message: telebot.types.Message):
     db = next(get_db())
-    handlers.handle_create_command(bot, message, db)
+    handlers.handle_create_command(bot, message.chat.id, message.from_user.id, db)
 
 @bot.callback_query_handler(func=lambda call: call.data == 'create_wallet')
 def create_callback_handler(call: telebot.types.CallbackQuery):
     db = next(get_db())
     bot.answer_callback_query(call.id)
-    handlers.handle_create_command(bot, call.message, db)
-
-# --- Placeholder Handlers for New Menu Buttons ---
+    handlers.handle_create_command(bot, call.message.chat.id, call.from_user.id, db)
 
 @bot.callback_query_handler(func=lambda call: call.data == 'learn_more')
 def learn_more_handler(call: telebot.types.CallbackQuery):
@@ -55,21 +52,18 @@ def learn_more_handler(call: telebot.types.CallbackQuery):
 
 @bot.callback_query_handler(func=lambda call: call.data == 'check_balance')
 def check_balance_handler(call: telebot.types.CallbackQuery):
-    """Handles the 'check_balance' button, calling the new logic handler."""
     db = next(get_db())
     bot.answer_callback_query(call.id)
-    # Call the new handler function with the business logic
-    handlers.handle_check_balance(bot, call.message, db)
+    handlers.handle_check_balance(bot, call.message.chat.id, call.from_user.id, db)
 
 @bot.callback_query_handler(func=lambda call: call.data == 'send_xrp')
 def send_xrp_handler(call: telebot.types.CallbackQuery):
-    bot.answer_callback_query(call.id)
-    bot.send_message(call.message.chat.id, "Let's send some XRP! (Functionality coming soon!)")
-    
-@bot.callback_query_handler(func=lambda call: call.data == 'view_price_history')
-def price_history_handler(call: telebot.types.CallbackQuery):
-    """Handles the 'view_price_history' button, calling the new logic handler."""
     db = next(get_db())
     bot.answer_callback_query(call.id)
-    # Call the new handler function with the business logic
-    handlers.handle_view_price_history(bot, call.message, db)
+    handlers.handle_send_xrp(bot, call.message.chat.id, call.from_user.id, db)
+
+@bot.callback_query_handler(func=lambda call: call.data == 'view_price_history')
+def price_history_handler(call: telebot.types.CallbackQuery):
+    db = next(get_db())
+    bot.answer_callback_query(call.id)
+    handlers.handle_view_price_history(bot, call.message.chat.id, call.from_user.id, db)

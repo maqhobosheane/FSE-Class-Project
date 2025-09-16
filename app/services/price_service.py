@@ -19,7 +19,7 @@ def get_price_history():
         response = requests.get(API_URL, params=params, timeout=10) # <-- ADD TIMEOUT
         response.raise_for_status()
 
-        print("--- API call successful! Formatting data... ---") # <-- ADD THIS
+        print("--- API call successful! Formatting data... ---") 
 
         data = response.json()
         prices = data.get('prices', [])
@@ -37,5 +37,5 @@ def get_price_history():
         return formatted_message
 
     except requests.exceptions.RequestException as e:
-        print(f"--- API request FAILED: {e} ---") # <-- ADD THIS FOR ERRORS
+        print(f"--- API request FAILED: {e} ---") 
         return "Sorry, there was an error fetching the price data. Please try again later."
