@@ -7,7 +7,7 @@ def get_price_history():
     """
     Fetches the last 7 days of XRP price data from the CoinGecko API.
     """
-    print("--- Attempting to call CoinGecko API... ---") # <-- DEBUG
+    print("--- Attempting to call CoinGecko API... ---")
     try:
         params = {
             'vs_currency': 'usd',
