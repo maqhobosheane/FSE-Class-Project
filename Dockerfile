@@ -40,4 +40,4 @@ EXPOSE 8080
 # The command to run the application using a production-grade WSGI server (Gunicorn)
 RUN useradd --create-home appuser
 USER appuser
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "run:flask_app"]
+CMD ["/app/start.sh"]
