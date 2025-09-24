@@ -2,22 +2,22 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 def create_main_menu_keyboard():
     """
-    Creates the main 2x2 menu keyboard.
-    - Row 1: Learn More, Check Balance
-    - Row 2: Send XRP, View Price History
+    Creates the main menu keyboard with a 2x2 grid and a history button below.
     """
     markup = InlineKeyboardMarkup()
     
-    # --- UX IMPROVEMENT: Create a 2x2 grid layout ---
-    # Define all four buttons
+    # Define all five buttons
     btn_learn_more = InlineKeyboardButton("💡 Learn More", callback_data='learn_more')
     btn_check_balance = InlineKeyboardButton("💰 Check Balance", callback_data='check_balance')
     btn_send_xrp = InlineKeyboardButton("💸 Send XRP", callback_data='send_xrp')
     btn_view_price = InlineKeyboardButton("📈 View Price History", callback_data='view_price_history')
     
-    # Add buttons in rows of two
+    btn_view_tx_history = InlineKeyboardButton("📜 View Transaction History", callback_data='view_tx_history')
+    
+    # Add buttons in rows 
     markup.row(btn_learn_more, btn_check_balance)
     markup.row(btn_send_xrp, btn_view_price)
+    markup.row(btn_view_tx_history) # Add the txhistory button on its own full-width row
     
     return markup
 

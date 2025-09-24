@@ -67,3 +67,9 @@ def price_history_handler(call: telebot.types.CallbackQuery):
     db = next(get_db())
     bot.answer_callback_query(call.id)
     handlers.handle_view_price_history(bot, call.message.chat.id, call.from_user.id, db)
+    
+@bot.callback_query_handler(func=lambda call: call.data == 'view_tx_history')
+def tx_history_handler(call: telebot.types.CallbackQuery):
+    db = next(get_db())
+    bot.answer_callback_query(call.id)
+    handlers.handle_view_tx_history(bot, call.message.chat.id, call.from_user.id, db)

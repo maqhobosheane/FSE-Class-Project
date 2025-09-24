@@ -181,7 +181,8 @@ def handle_send_xrp(bot: telebot.TeleBot, chat_id: int, tg_id: int, db: Session)
         bot.send_message(chat_id, "Please use /start and create a wallet first.")
         return
     
-    msg = bot.send_message(chat_id, "Please reply with the destination XRPL address (r...). Or, click the menu button below to cancel.")
+    msg = bot.send_message(chat_id, "Please reply with the destination XRPL address (r...). Or, click any menu button item below to cancel.")
+    _send_main_menu(bot, chat_id)
     bot.register_next_step_handler(msg, lambda m: get_recipient_address(bot, m, db))
 
 def get_recipient_address(bot: telebot.TeleBot, message: telebot.types.Message, db: Session):
@@ -257,4 +258,30 @@ def get_amount_and_send(bot: telebot.TeleBot, message: telebot.types.Message, db
     finally:
         # --- Guarantees the menu is always shown, even if an error occurs ---
         _send_main_menu(bot, chat_id)
+        
+def handle_view_tx_history(bot: telebot.TeleBot, chat_id: int, tg_id: int, db: Session):
+    """
+    Handles 'View Transaction History', fetching and displaying recent transactions.
+    """
+    user = crud.get_user_by_telegram_id(db, tg_id=tg_id)
+    if not user:
+        bot.send_message(chat_id, "Please use /start and create a wallet first.")
+        return
+
+    bot.send_message(chat_id, "Fetching your transaction history... 📜")
+
+    transactions = xrpl_wallet.get_transaction_history(user.wallet_address)
+    
+    if not transactions:
+        response_text = "You have no recent transactions."
+    else:
+        response_text = "Here are your last 5 transactions:\n\n"
+        for tx in transactions:
+            if tx['type'] == 'sent':
+                response_text += f"➡️ *Sent* {tx['amount']} XRP\nTo: `{tx['counterparty']}`\n\n"
+            else:
+                response_text += f"⬅️ *Received* {tx['amount']} XRP\nFrom: `{tx['counterparty']}`\n\n"
+    
+    bot.send_message(chat_id, response_text, parse_mode="Markdown")
+    _send_main_menu(bot, chat_id)
 
