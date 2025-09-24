@@ -48,7 +48,7 @@ def create_callback_handler(call: telebot.types.CallbackQuery):
 @bot.callback_query_handler(func=lambda call: call.data == 'learn_more')
 def learn_more_handler(call: telebot.types.CallbackQuery):
     bot.answer_callback_query(call.id)
-    bot.send_message(call.message.chat.id, "This bot helps you manage an XRPL testnet wallet. (Functionality coming soon!)")
+    handlers.handle_learn_more(bot, call.message.chat.id)
 
 @bot.callback_query_handler(func=lambda call: call.data == 'check_balance')
 def check_balance_handler(call: telebot.types.CallbackQuery):

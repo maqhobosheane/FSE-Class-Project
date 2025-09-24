@@ -1,38 +1,33 @@
-# app/telegram_bot/keyboards.py
-from telebot import types
-
-def create_account_keyboard():
-    """Generates a simple inline keyboard with a '/create' button."""
-    keyboard = types.InlineKeyboardMarkup()
-    create_button = types.InlineKeyboardButton(text="Create Wallet 🚀", callback_data="create_wallet")
-    keyboard.add(create_button)
-    return keyboard
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 def create_main_menu_keyboard():
-    """Generates the main menu keyboard with user options."""
-    keyboard = types.InlineKeyboardMarkup(row_width=1)
+    """
+    Creates the main 2x2 menu keyboard.
+    - Row 1: Learn More, Check Balance
+    - Row 2: Send XRP, View Price History
+    """
+    markup = InlineKeyboardMarkup()
     
-    learn_more_button = types.InlineKeyboardButton(
-        text="Learn More About the Bot 📚", 
-        callback_data="learn_more"
-    )
-    check_balance_button = types.InlineKeyboardButton(
-        text="Check Balance 💰", 
-        callback_data="check_balance"
-    )
-    send_xrp_button = types.InlineKeyboardButton(
-        text="Send XRP 💸", 
-        callback_data="send_xrp"
-    )
-    price_history_button = types.InlineKeyboardButton(
-        text="View Price History 📈", 
-        callback_data="view_price_history"
-    )
+    # --- UX IMPROVEMENT: Create a 2x2 grid layout ---
+    # Define all four buttons
+    btn_learn_more = InlineKeyboardButton("💡 Learn More", callback_data='learn_more')
+    btn_check_balance = InlineKeyboardButton("💰 Check Balance", callback_data='check_balance')
+    btn_send_xrp = InlineKeyboardButton("💸 Send XRP", callback_data='send_xrp')
+    btn_view_price = InlineKeyboardButton("📈 View Price History", callback_data='view_price_history')
     
-    keyboard.add(
-        learn_more_button, 
-        check_balance_button, 
-        send_xrp_button, 
-        price_history_button
+    # Add buttons in rows of two
+    markup.row(btn_learn_more, btn_check_balance)
+    markup.row(btn_send_xrp, btn_view_price)
+    
+    return markup
+
+def create_account_keyboard():
+    """
+    Creates the initial keyboard for new users.
+    """
+    markup = InlineKeyboardMarkup()
+    markup.row(
+        InlineKeyboardButton("✅ Create Wallet", callback_data='create_wallet'),
+        InlineKeyboardButton("💡 Learn More", callback_data='learn_more')
     )
-    return keyboard
+    return markup
