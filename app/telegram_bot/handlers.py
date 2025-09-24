@@ -61,23 +61,24 @@ def handle_create_command(bot: telebot.TeleBot, chat_id: int, tg_id: int, db: Se
     
 def handle_view_price_history(bot: telebot.TeleBot, chat_id: int, tg_id: int, db: Session):
     """
-    Handles the 'View Price History' button click.
-    Verifies the user and sends the price history.
+    Handles 'View Price History', generating and sending a chart.
     """
-    # 1. Verify user exists in the database using the ACTUAL user's Telegram ID
     user = crud.get_user_by_telegram_id(db, tg_id=tg_id)
     if not user:
         bot.send_message(chat_id, "Please use /start and create a wallet first.")
         return
 
-    # Let the user know we're working on it
-    bot.send_message(chat_id, "Fetching price history... 📈")
+    bot.send_message(chat_id, "Generating price chart... 📈")
 
-    # 2. Call the price service to get the data
-    price_message = price_service.get_price_history()
+    #Call the service to get the chart image buffer
+    chart_image_buffer = price_service.generate_price_chart_image()
     
-    # 3. Send the formatted message to the user
-    bot.send_message(chat_id, price_message, parse_mode="Markdown")
+    #Send the photo to the user
+    if chart_image_buffer:
+        caption = f"Here is the XRP price chart for the last 7 days.\n_Data from CoinGecko._"
+        bot.send_photo(chat_id, photo=chart_image_buffer, caption=caption, parse_mode="Markdown")
+    else:
+        bot.send_message(chat_id, "Sorry, I couldn't generate the price chart at this time. Please try again later.")
     
 def handle_check_balance(bot: telebot.TeleBot, chat_id: int, tg_id: int, db: Session):
     """
