@@ -2,22 +2,37 @@ import requests
 from datetime import datetime
 import matplotlib.pyplot as plt
 import io
+from app.database.session import get_db
+from app.database import crud
 
-# Matplotlib configuration to run in  Docker
+# Matplotlib configuration to run in Docker
 plt.switch_backend('Agg')
 
 API_URL = "https://api.coingecko.com/api/v3/coins/ripple/market_chart"
 
 def generate_price_chart_image():
     """
-    Fetches price data and generates a PNG chart image with a dark theme in memory.
+    Fetches price data (with caching) and generates a PNG chart image with a dark theme in memory.
     Returns a file-like object (BytesIO) or None on error.
     """
     try:
-        params = { 'vs_currency': 'usd', 'days': '7', 'interval': 'daily' }
-        response = requests.get(API_URL, params=params, timeout=10)
-        response.raise_for_status()
-        data = response.json()
+        # First, try to get cached data
+        db = next(get_db())
+        cached_data = crud.get_price_cache(db)
+        
+        if cached_data:
+            print("--- Using cached price data ---")
+            data = cached_data.price_data
+        else:
+            print("--- Fetching fresh price data from API ---")
+            params = {'vs_currency': 'usd', 'days': '7', 'interval': 'daily'}
+            response = requests.get(API_URL, params=params, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            
+            # Cache the successful API response
+            crud.save_price_cache(db, data)
+        
         prices = data.get('prices', [])
 
         if not prices:
@@ -31,7 +46,6 @@ def generate_price_chart_image():
         plt.style.use('dark_background')
         fig, ax = plt.subplots(figsize=(10, 6))
 
-        
         # Set the outer background color of the figure
         fig.patch.set_facecolor('#1C1C1C') 
         # Set the inner background color of the plotting area
@@ -51,7 +65,6 @@ def generate_price_chart_image():
         for spine in ax.spines.values():
             spine.set_edgecolor('#555555') # A slightly softer gray for borders
 
-        
         buf = io.BytesIO()
         # Set transparent=False to include the background colors
         plt.savefig(buf, format='png', transparent=False, bbox_inches='tight', dpi=100)
