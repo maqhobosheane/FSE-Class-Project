@@ -71,7 +71,7 @@ def handle_learn_more(bot: telebot.TeleBot, chat_id: int):
     Handles the 'Learn More' button click, providing info about the bot.
     """
     # --- Our documentation is attached ---
-    google_doc_link = "https://docs.google.com/document/u/0/d/1eZPqM3_CR2h5sMFyKosi21Wpx9URxpKIYuzQm4McegM/mobilebasic" 
+    google_doc_link = "https://1drv.ms/w/c/cf396881e1a7af9e/ERC20yu-Ch1Buw1PFjvBcNwBjQuzaq6-bkTvLbW6GEXzsA?e=wWAQxA" 
 
     learn_more_text = (
         "This bot allows you to store and send XRP to any of your peers on the XRPL testnet. 💸\n\n"
